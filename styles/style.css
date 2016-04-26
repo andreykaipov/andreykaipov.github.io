@@ -1,0 +1,91 @@
+/* Content stuff */
+body {
+    margin: 0;
+    background-color: #fef2aa;
+    font-size: 16px;
+}
+
+.eight.columns {
+    background-color: #fef2e4;
+    outline: solid 80px #fef2e4;
+    padding-top: 60px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Fill content to the botttom of the page. */
+html, body, .container, .row {
+    height: 100%;
+}
+.eight.columns {
+    min-height: 100%;
+}
+
+/* Pad my name so that Skeleton can split it into two lines earlier. */
+#my-name {
+    padding-right: 100px;
+}
+
+/* Tell me I'm pretty. */
+#my-face {
+    height: 100px;
+    float: right;
+    margin: -115px 0px -100px 0px;
+}
+
+#top-divider {
+    margin-top: -5px;
+    margin-bottom: 20px;
+}
+
+#hello {
+    padding-top: 5px;
+}
+
+hr {
+    background-color: #ee693f;
+    border-width: 0px;
+    height: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: #e73f0b;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #e73f0b;
+}
+
+/* Desktop first. Boooo mobile. */
+
+/* If width <= 865px, my name splits into two lines, so move the content up a bit. */
+@media (max-width: 865px) {
+    .eight.columns {
+        padding-top: 20px;
+    }
+}
+
+/* If width <= 549px, Skeleton resizes so that the columns have width 100%,
+ * so hide the side columns and adjust the content's top padding again. */
+@media (max-width: 549px ) {
+    .two.columns {
+        display: none;
+    }
+    .eight.columns {
+        padding-top: 50px;
+    }
+}
+
+/* If width <= 455px, my name splits into two lines, so same deal as above. */
+@media (max-width: 455px) {
+    .eight.columns {
+        padding-top: 20px;
+    }
+}
+
+/* For debugging. */
+/*.columns, .row, .container {
+    border: solid 1px black;
+}*/
