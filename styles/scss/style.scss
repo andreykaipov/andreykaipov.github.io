@@ -11,7 +11,7 @@ $link-color: #000;
 body {
   margin: 0 auto;
   background-color: $body-background-color;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   font-family: Consolas, monaco, monospace, Verdana;
 }
 
@@ -65,6 +65,7 @@ ul.fa-ul {
 }
 
 a {
+  font-style: italic;
   text-decoration: none;
   color: $link-color;
   font-weight: bold;

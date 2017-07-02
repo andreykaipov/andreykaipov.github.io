@@ -2,7 +2,7 @@
 body {
   margin: 0 auto;
   background-color: #a3cad2;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   font-family: Consolas, monaco, monospace, Verdana; }
 
 .ten.columns {
@@ -43,6 +43,7 @@ ul.fa-ul li i.fa-li {
   color: #000; }
 
 a {
+  font-style: italic;
   text-decoration: none;
   color: #000;
   font-weight: bold; }
