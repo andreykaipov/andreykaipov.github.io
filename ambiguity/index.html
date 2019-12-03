@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  <title>Sentence Ambiguity</title>
+
+  <link rel="stylesheet" href="../styles/small-skeleton.css">
+  <link rel="stylesheet" href="../styles/style.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+    crossorigin="anonymous">
+
+</head>
+
+<style>
+body {
+  background-color: #a3cad2;
+  font-size: 1.7rem;
+  font-family: Verdana; }
+.twelve.columns {
+  background-color: #fef2fa;
+  outline: solid 1px black;
+  padding: 30px 100px 0px 100px; }
+@media (max-width: 865px) {
+  .twelve.columns {
+    padding: 30px 10px 0px 10px; } }
+pre {
+  padding: 0px 5px;
+  background-color: #f0f0f0;
+  outline: solid 1px black;
+  white-space: pre-wrap; }
+a {
+  text-decoration: underline; }
+</style>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="twelve columns">
+        <div class="page-wrapper">
+          <div class="header">
+            <h3>Sentence Ambiguity</h3>
+          </div>
+          <div class="content">
+            <p>
+              Unlike mathematical notation or programming languages, human languages tend to be ambiguous.
+              For example, consider the following sentence:
+            </p>
+            <p>
+              <q>Check out this bird I caught with my friend's camera!</q>
+            </p>
+            <p>
+              Did the speaker of the sentence:
+
+              <ul>
+                <li>Use their friend's camera to take a cool picture of a cool bird?</li>
+                <li>Use an unspecified object (e.g. a cage) to safely capture the bird, which surprisingly had their friend's camera? Birds do like shiny things.</li>
+                <li>Use their friend's phone to safely capture the bird. Maybe the friend is James Bond, and Bond's phone has the ability to transform into a device capable of safely catching birds.</li>
+                <li>Witness the bird flirting with their friend's camera. Maybe the bird loves themselves and saw their reflection in the camera's lens?</li>
+              </ul>
+
+              While a few of these options may be a bit unlikely, ambiguity exists.
+            </p>
+            <h4>What causes ambiguity?</h4>
+              <p>Considering the above sentence again, the prevailing <i>points of ambiguity</i> are the verb <q>caught</q> and the preposition <q>with</q>.</p>
+              <p>In our example interpretations, <q>caught</q> has at least three meanings. The text below in parentheses corresponds to the <a href="http://wordnetweb.princeton.edu/perl/webwn?o4=1&o7=1&s=caught">WordNet results for <q>caught</q></a>.</p>
+
+              <ul>
+                <li>taking a picture (verb.creation catch#24)</li>
+                <li>capture as if by hunting (verb.contact catch#8)</li>
+                <li>becoming aware of (verb.cognition catch#28)</li>
+              </ul>
+            
+              <p>In addition, ambiguity arises from <q>with</q>. We don't know if the preposition modifies the verb <q>caught</q>, or the noun <q>bird</q>.</p>
+
+              <p>Of course, context solves most ambiguities, but we don't have that luxury. Further, the purpose of this article isn't to solve ambiguity. It's rather a wide and difficult problem in computational linguistics. The actual purpose is to define ambiguity.</p>
+            </p>
+            <p>
+            <h4 id="calculating-ambiguity">Calculating Ambiguity</h4>
+              <p>We can naively define the ambiguity of a sentence to be sum of the ambiguities of the constituent words, where the ambiguity of a word is just the number of <a href="https://en.wikipedia.org/wiki/Word_sense">word senses</a> of a word.</p>
+
+              <p>We'll use the lexical database <a href="https://wordnet.princeton.edu/">WordNet</a> to find word senses -- a sort of combination between a dictionary and a thesaurus. There's no HTTP API, so we'll just parse the HTML the server generates when we search for a word. For example, each word sense shows up as a list element, so we can just count how many times we see one to find a word's ambiguity. Here's some shell that will do that:</p>
+              <pre>
+count_senses() {
+    word="$1"; shift
+    api="http://wordnetweb.princeton.edu/perl/webwn?s=$word"
+    curl -s "$api" | grep -c '&lt;li&gt;'
+}</pre>
+
+              <p>To calculate a sentence's ambiguity, we just do some arithmetic.</p>
+              <pre>
+sentence_ambiguity() {
+    sentence="$1"; shift
+    samb=0
+    for w in $sentence; do
+        wamb="$(count_senses "$w")"
+        samb="$((samb + wamb))"
+    done
+    echo $samb
+}</pre>
+
+              <p>Now consider the following example contemporary sentences passed into the above function:</p>
+              
+              <pre>
+$ s1="great i will keep you posted"
+$ s2="okay sounds good what are you up to today"
+$ sentence_ambiguity "$s1"
+56
+$ sentence_ambiguity "$s2"
+78</pre>
+
+              <p>We can see the latter sentence has a higher ambiguity, but of course this is just because it has more words. What we really want to consider is the <i>weighted ambiguity</i>. By giving each word equal weight, we can just divide the total ambiguity by the number of words in the sentence:</p>
+
+              <pre>
+$ s1wc="$(echo "$s1" | wc -w)"
+$ s2wc="$(echo "$s2" | wc -w)"
+$ echo "56 / $s1wc" | bc -l
+9.33333333333333333333
+$ echo "78 / $s2wc" | bc -l
+8.66666666666666666666</pre>
+
+              <p>So, these two sentences are pretty similar in ambiguity. However, what's the significance of the ambiguity value? I don't know. We're just having fun. I suppose we can calculate the ambiguity of several English words and sentences to find the average ambiguity of a word, and see whether our values deviate or not.</p>
+          </div>
+          <div class="footer">
+            <hr>
+            <h5>Limitations</h5>
+            <ul>
+              <li>The above definition of ambiguity represents lexical or semantic ambiguity, whereas syntactic ambiguity is ignored.</li>
+              <li>WordNet only contains open-class words, i.e. nouns, verbs, adjectives, and adverbs. So, the ambiguity of any determiners, prepositions, pronouns, and other function words is effectively zero. This may be okay when considering only lexical ambiguity though.</li>
+            </ul>
+            <h5>References</h5>
+            <ul>
+              <li>https://wordnet.princeton.edu</li>
+              <li>https://en.wikipedia.org/wiki/Word-sense_disambiguation</li>
+              <li>https://medium.com/@jrodthoughts/ambiguity-in-natural-language-processing-15f3e4706a9a</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
